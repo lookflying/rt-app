@@ -323,22 +323,22 @@ void *thread_body(void *arg)
 		t_diff = timespec_sub(&t_end, &t_start);
 		t_slack = timespec_sub(&data->deadline, &t_end);
 
-		t_start_usec = timespec_to_usec(&t_start); 
+		t_start_usec = timespec_to_usec_ull(&t_start); 
 		if (timings)
 			curr_timing = &timings[i];
 		else
 			curr_timing = &tmp_timing;
 		curr_timing->ind = data->ind;
-		curr_timing->period = timespec_to_usec(&data->period);
-		curr_timing->min_et = timespec_to_usec(&data->min_et);
-		curr_timing->max_et = timespec_to_usec(&data->max_et);
+		curr_timing->period = timespec_to_usec_ull(&data->period);
+		curr_timing->min_et = timespec_to_usec_ull(&data->min_et);
+		curr_timing->max_et = timespec_to_usec_ull(&data->max_et);
 		curr_timing->rel_start_time = 
-			t_start_usec - timespec_to_usec(&data->main_app_start);
+			t_start_usec - timespec_to_usec_ull(&data->main_app_start);
 		curr_timing->abs_start_time = t_start_usec;
-		curr_timing->end_time = timespec_to_usec(&t_end);
-		curr_timing->deadline = timespec_to_usec(&data->deadline);
-		curr_timing->duration = timespec_to_usec(&t_diff);
-		curr_timing->slack =  timespec_to_lusec(&t_slack);
+		curr_timing->end_time = timespec_to_usec_ull(&t_end);
+		curr_timing->deadline = timespec_to_usec_ull(&data->deadline);
+		curr_timing->duration = timespec_to_usec_ull(&t_diff);
+		curr_timing->slack =  timespec_to_lusec_ll(&t_slack);
 #ifdef AQUOSA
 		if (data->sched_policy == aquosa) {
 			curr_timing->budget = data->params.Q;

@@ -139,15 +139,15 @@ typedef struct _rtapp_options_t {
 
 typedef struct _timing_point_t {
 	int ind;
-	unsigned long period;
-	unsigned long min_et;
-	unsigned long max_et;
-	unsigned long rel_start_time;
-	unsigned long abs_start_time;
-	unsigned long end_time;
-	unsigned long deadline;
-	unsigned long duration;
-	long slack;
+	unsigned long long period;
+	unsigned long long min_et;
+	unsigned long long max_et;
+	unsigned long long rel_start_time;
+	unsigned long long abs_start_time;
+	unsigned long long end_time;
+	unsigned long long deadline;
+	unsigned long long duration;
+	long long slack;
 #ifdef AQUOSA
 	qres_time_t budget;
 	qres_time_t used_budget;
