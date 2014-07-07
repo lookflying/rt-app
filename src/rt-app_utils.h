@@ -91,6 +91,13 @@ timespec_to_lusec(struct timespec *ts);
 unsigned long 
 timespec_to_usec(struct timespec *ts);
 
+long long 
+timespec_to_lusec_ll(struct timespec *ts);
+
+unsigned long long
+timespec_to_usec_ull(struct timespec *ts);
+
+
 struct timespec 
 usec_to_timespec(unsigned long usec);
 
