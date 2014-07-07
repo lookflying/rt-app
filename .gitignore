@@ -23,4 +23,4 @@ src/config.h.in
 src/rt-app
 src/*.o
 src/stamp-h1
-
+cscope.out
