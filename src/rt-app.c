@@ -123,8 +123,8 @@ void *thread_body(void *arg)
 	thread_data_t *data = (thread_data_t*) arg;
 	struct sched_param param;
 	struct timespec t, t_next;
-	unsigned long t_start_usec;
-	unsigned long my_duration_usec;
+	unsigned long long t_start_usec;
+	unsigned long long my_duration_usec;
 	int nperiods;
 	timing_point_t *timings;
 	timing_point_t tmp_timing;
