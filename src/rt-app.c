@@ -125,6 +125,8 @@ void *thread_body(void *arg)
 	struct timespec t, t_next;
 	unsigned long long t_start_usec;
 	unsigned long long my_duration_usec;
+	unsigned long long t_deadline_usec, t_exec_usec;
+
 	int nperiods;
 	timing_point_t *timings;
 	timing_point_t tmp_timing;
@@ -310,20 +312,31 @@ void *thread_body(void *arg)
 	t_next = t;
 	data->deadline = timespec_add(&t, &data->deadline);
 
+	t_exec_usec = timespec_to_usec_ull(&data->max_et);
 	while (continue_running) {
 		struct timespec t_start, t_end, t_diff, t_slack;
 
 		if (opts.ftrace)
 			log_ftrace(ft_data.marker_fd, "[%d] begins loop %d", data->ind, i);
+		t_deadline_usec = timespec_to_usec_ull(&data->deadline);
 		clock_gettime(CLOCK_MONOTONIC, &t_start);
-		run(data->ind, &data->min_et, &data->max_et, data->blockages,
-		    data->nblockages);
-		clock_gettime(CLOCK_MONOTONIC, &t_end);
-		
-		t_diff = timespec_sub(&t_end, &t_start);
-		t_slack = timespec_sub(&data->deadline, &t_end);
-
 		t_start_usec = timespec_to_usec_ull(&t_start); 
+		if (t_start_usec + t_exec_usec <= t_deadline_usec)
+		{
+			run(data->ind, &data->min_et, &data->max_et, data->blockages,
+				  data->nblockages);
+			clock_gettime(CLOCK_MONOTONIC, &t_end);
+		
+			t_diff = timespec_sub(&t_end, &t_start);
+			t_slack = timespec_sub(&data->deadline, &t_end);
+		}
+		else
+		{
+			clock_gettime(CLOCK_MONOTONIC, &t_end);
+			t_diff = timespec_sub(&t_start, &t_start);
+			t_slack =	timespec_add(&t_start, &data->max_et); 
+		}
+
 		if (timings)
 			curr_timing = &timings[i];
 		else
@@ -336,7 +349,8 @@ void *thread_body(void *arg)
 			t_start_usec - timespec_to_usec_ull(&data->main_app_start);
 		curr_timing->abs_start_time = t_start_usec;
 		curr_timing->end_time = timespec_to_usec_ull(&t_end);
-		curr_timing->deadline = timespec_to_usec_ull(&data->deadline);
+/*		curr_timing->deadline = timespec_to_usec_ull(&data->deadline);*/
+		curr_timing->deadline = t_deadline_usec;
 		curr_timing->duration = timespec_to_usec_ull(&t_diff);
 		curr_timing->slack =  timespec_to_lusec_ll(&t_slack);
 #ifdef AQUOSA
