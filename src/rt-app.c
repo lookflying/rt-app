@@ -314,7 +314,7 @@ void *thread_body(void *arg)
 
 	t_exec_usec = timespec_to_usec_ull(&data->max_et);
 	while (continue_running) {
-		struct timespec t_start, t_end, t_diff, t_slack;
+		struct timespec t_start, t_end, t_diff, t_slack, t_tmp;
 
 		if (opts.ftrace)
 			log_ftrace(ft_data.marker_fd, "[%d] begins loop %d", data->ind, i);
@@ -334,7 +334,9 @@ void *thread_body(void *arg)
 		{
 			clock_gettime(CLOCK_MONOTONIC, &t_end);
 			t_diff = timespec_sub(&t_start, &t_start);
-			t_slack =	timespec_add(&t_start, &data->max_et); 
+			t_tmp =	timespec_sub(&data->deadline, &t_start);
+			t_slack =	timespec_sub(&t_tmp, &data->max_et);
+
 		}
 
 		if (timings)
