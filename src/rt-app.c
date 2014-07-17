@@ -255,10 +255,10 @@ void *thread_body(void *arg)
 	if (data->wait_before_start > 0) {
 		log_notice("[%d] Waiting %ld usecs... ", data->ind, 
 			 data->wait_before_start);
-		clock_gettime(CLOCK_MONOTONIC, &t);
+		clock_gettime(CLOCK_REALTIME, &t);
 		t_next = msec_to_timespec(data->wait_before_start);
 		t_next = timespec_add(&t, &t_next);
-		clock_nanosleep(CLOCK_MONOTONIC, 
+		clock_nanosleep(CLOCK_REALTIME, 
 				TIMER_ABSTIME, 
 				&t_next,
 				NULL);
@@ -308,7 +308,7 @@ void *thread_body(void *arg)
 
 	if (opts.ftrace)
 		log_ftrace(ft_data.marker_fd, "[%d] starts", data->ind);
-	clock_gettime(CLOCK_MONOTONIC, &t);
+	clock_gettime(CLOCK_REALTIME, &t);
 	t_next = t;
 	data->deadline = timespec_add(&t, &data->deadline);
 
@@ -319,20 +319,20 @@ void *thread_body(void *arg)
 		if (opts.ftrace)
 			log_ftrace(ft_data.marker_fd, "[%d] begins loop %d", data->ind, i);
 		t_deadline_usec = timespec_to_usec_ull(&data->deadline);
-		clock_gettime(CLOCK_MONOTONIC, &t_start);
+		clock_gettime(CLOCK_REALTIME, &t_start);
 		t_start_usec = timespec_to_usec_ull(&t_start); 
 		if (t_start_usec + t_exec_usec <= t_deadline_usec)
 		{
 			run(data->ind, &data->min_et, &data->max_et, data->blockages,
 				  data->nblockages);
-			clock_gettime(CLOCK_MONOTONIC, &t_end);
+			clock_gettime(CLOCK_REALTIME, &t_end);
 		
 			t_diff = timespec_sub(&t_end, &t_start);
 			t_slack = timespec_sub(&data->deadline, &t_end);
 		}
 		else
 		{
-			clock_gettime(CLOCK_MONOTONIC, &t_end);
+			clock_gettime(CLOCK_REALTIME, &t_end);
 			t_diff = timespec_sub(&t_start, &t_start);
 			t_tmp =	timespec_sub(&data->deadline, &t_start);
 			t_slack =	timespec_sub(&t_tmp, &data->max_et);
@@ -386,7 +386,7 @@ void *thread_body(void *arg)
 			shutdown(SIGTERM);
 			goto exit_miss;
 		}
-		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t_next, NULL);
+		clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &t_next, NULL);
 		i++;
 	}
 
@@ -467,7 +467,7 @@ int main(int argc, char* argv[])
 	continue_running = 1;
 
 	/* Take the beginning time for everything */
-	clock_gettime(CLOCK_MONOTONIC, &t_start);
+	clock_gettime(CLOCK_REALTIME, &t_start);
 
 	/* start threads */
 	for (i = 0; i < nthreads; i++)
